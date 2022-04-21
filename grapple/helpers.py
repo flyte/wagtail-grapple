@@ -379,7 +379,11 @@ def register_plural_query_field(
     middleware=None,
     paginated=False,
     keep_default_query_params=False,
+    max_limit=None,
 ):
+    if paginated and limit is not None:
+        raise ValueError("paginated and limit cannot be set at the same time.")
+
     if paginated:
         from .types.structures import PaginatedQuerySet
         from .utils import resolve_paginated_queryset
@@ -409,7 +413,12 @@ def register_plural_query_field(
                 if paginated:
                     return resolve_paginated_queryset(qs.all(), info, **kwargs)
                 else:
-                    return resolve_queryset(qs.all(), info, **kwargs)
+                    if max_limit is not None:
+                        limit = max(max_limit, kwargs.pop("limit", 0))
+                    else:
+                        limit = None
+
+                    return resolve_queryset(qs.all(), info, limit, **kwargs)
 
             # Create schema and add resolve methods
             schema = type(cls.__name__ + "Query", (), {})
