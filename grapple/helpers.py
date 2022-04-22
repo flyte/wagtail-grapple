@@ -414,7 +414,9 @@ def register_plural_query_field(
                     return resolve_paginated_queryset(qs.all(), info, **kwargs)
                 else:
                     if max_limit is not None:
-                        kwargs["limit"] = max(max_limit, kwargs.get("limit", 0))
+                        kwargs["limit"] = min(
+                            max_limit, kwargs.get("limit", float("+inf"))
+                        )
 
                     return resolve_queryset(qs.all(), info, **kwargs)
 
