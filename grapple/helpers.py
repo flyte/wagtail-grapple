@@ -414,11 +414,9 @@ def register_plural_query_field(
                     return resolve_paginated_queryset(qs.all(), info, **kwargs)
                 else:
                     if max_limit is not None:
-                        limit = max(max_limit, kwargs.pop("limit", 0))
-                    else:
-                        limit = None
+                        kwargs["limit"] = max(max_limit, kwargs.get("limit", 0))
 
-                    return resolve_queryset(qs.all(), info, limit, **kwargs)
+                    return resolve_queryset(qs.all(), info, **kwargs)
 
             # Create schema and add resolve methods
             schema = type(cls.__name__ + "Query", (), {})
